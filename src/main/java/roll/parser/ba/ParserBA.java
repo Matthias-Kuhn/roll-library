@@ -179,7 +179,8 @@ public class ParserBA implements Parser {
 		}
 
 		ch = (char) strCharMap.size();
-		if(ch >= '$' )   ch ++; // reserve '$' sign
+		ch = label.charAt(0);
+		//if(ch >= '$' )   ch ++; // reserve '$' sign
 		strCharMap.put(label, ch);
 		charStrMap.put(ch, label);
 		alphabet.addLetter(ch); // add characters
