@@ -29,6 +29,7 @@ import gnu.trove.procedure.TIntProcedure;
 import roll.automata.DFA;
 import roll.automata.StateNFA;
 import roll.learner.LearnerType;
+import roll.main.Log;
 import roll.main.Options;
 import roll.oracle.MembershipOracle;
 import roll.query.Query;
@@ -141,7 +142,6 @@ public class LearnerDFATableLStar extends LearnerDFATable {
     private boolean makeTableConsistent() {
         ExprValue exprValue = observationTable.getInconsistentColumn();
         boolean isConsistent = exprValue == null;
-        
         while(exprValue != null) {
             // 1. add to columns
             int columnIndex = observationTable.addColumn(exprValue);

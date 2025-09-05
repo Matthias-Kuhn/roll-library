@@ -1,0 +1,141 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "DFA2DBA",
+            "request": "launch",
+            "mainClass": "roll.automata.operations.DFA2DBA",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "NBAInclusionCheckTool",
+            "request": "launch",
+            "mainClass": "roll.automata.operations.nba.inclusion.NBAInclusionCheckTool",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "ROLL",
+            "request": "launch",
+            "mainClass": "roll.main.ROLL",
+            "projectName": "roll-library",
+            "args": [
+                "learn",
+                "-ldollar",
+                "/home/matthias/projects/master-code/roll-library/src/main/resources/ba/a$ab.ba",
+                "-v", 
+                "2"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "ComplementCongruence",
+            "request": "launch",
+            "mainClass": "roll.main.complement.algos.ComplementCongruence",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "ComplementCongruenceOpt",
+            "request": "launch",
+            "mainClass": "roll.main.complement.algos.ComplementCongruenceOpt",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "NBAInclusionCheck",
+            "request": "launch",
+            "mainClass": "roll.main.inclusion.NBAInclusionCheck",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "NBAInclusionCheckSDBA",
+            "request": "launch",
+            "mainClass": "roll.main.inclusion.NBAInclusionCheckSDBA",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "CongruenceSimulation",
+            "request": "launch",
+            "mainClass": "roll.main.inclusion.congr.CongruenceSimulation",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "CongruenceSimulationOpt",
+            "request": "launch",
+            "mainClass": "roll.main.inclusion.congr.CongruenceSimulationOpt",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "ParallelCongruenceSimulation",
+            "request": "launch",
+            "mainClass": "roll.main.inclusion.congr.ParallelCongruenceSimulation",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "Simulation",
+            "request": "launch",
+            "mainClass": "roll.main.inclusion.congr.Simulation",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "NFAIntersectionCheck",
+            "request": "launch",
+            "mainClass": "roll.main.ltlf2dfa.NFAIntersectionCheck",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "UtilLTLf2DFA",
+            "request": "launch",
+            "mainClass": "roll.main.ltlf2dfa.UtilLTLf2DFA",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "SamplerIndexedMonteCarlo",
+            "request": "launch",
+            "mainClass": "roll.oracle.nba.sampler.SamplerIndexedMonteCarlo",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "ParserHOA2",
+            "request": "launch",
+            "mainClass": "roll.parser.hoa.ParserHOA2",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "ISetTest",
+            "request": "launch",
+            "mainClass": "roll.util.sets.ISetTest",
+            "projectName": "roll-library"
+        },
+        {
+            "type": "java",
+            "name": "PowerSet",
+            "request": "launch",
+            "mainClass": "roll.util.sets.PowerSet",
+            "projectName": "roll-library"
+        }
+    ]
+}

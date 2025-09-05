@@ -65,7 +65,7 @@ public class InteractiveMode {
             NFA hypothesis = learner.getHypothesis();
             // along with ce
             System.out.println("Resolving equivalence query for hypothesis (#Q=" + hypothesis.getStateSize() + ")...  ");
-            System.out.println("Learner: " + learner.toString());
+            System.out.println("Learner: \n" + learner.toString());
 //            LearnerNBALOmega ll = (LearnerNBALOmega)learner;
 //            System.out.println("FDFA: " + ll.getLearnerFDFA().getHypothesis().toString());
             Query<HashableValue> ceQuery = answerEquivalenceQuery(hypothesis);

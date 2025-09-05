@@ -80,6 +80,7 @@ public interface Word extends Iterable<Integer>, Comparable<Word> {
 		StringBuilder builder = new StringBuilder();
 		for(int letterNr = 0; letterNr < length(); letterNr ++) {
 			int letter = getLetter(letterNr);
+			String v = getAlphabet().toString();
 			builder.append(getLetters().get(letter).toString());
 		}
 		return builder.toString();

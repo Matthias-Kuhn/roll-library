@@ -32,6 +32,7 @@ public enum LearnerType {
 	NBA_FDFA,
 	DPA_FDFA,
 	NBA_LDOLLAR,
+	NBA_MLDOLLAR,
 	NBA_MP,
 	TDBA_FDFA,
 	WDBA_FDFA,
