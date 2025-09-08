@@ -14,7 +14,7 @@
 /* You should have received a copy of the GNU General Public License      */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-package roll.learner.nba.ldollar;
+package roll.learner.nba.mldollar;
 
 import roll.oracle.MembershipOracle;
 import roll.query.Query;
@@ -27,10 +27,10 @@ import roll.words.Word;
  * @author Yong Li (liyong@ios.ac.cn)
  * */
 
-class MembershipOracleNBALDollar implements MembershipOracle<HashableValue> {
+class MembershipOracleNBAMLDollar implements MembershipOracle<HashableValue> {
     private final MembershipOracle<HashableValue> membershipOracle;
     private final int dollarLetter ;
-    public MembershipOracleNBALDollar(
+    public MembershipOracleNBAMLDollar(
             MembershipOracle<HashableValue> membershipOracle,
             final int dollarLetter) {
         this.membershipOracle = membershipOracle;

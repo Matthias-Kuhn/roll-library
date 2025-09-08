@@ -14,7 +14,7 @@
 /* You should have received a copy of the GNU General Public License      */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-package roll.learner.nba.ldollar;
+package roll.learner.nba.mldollar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,9 +35,9 @@ import roll.words.Alphabet;
  * @author Yong Li (liyong@ios.ac.cn)
  * */
 
-public class UtilNBALDollar {
+public class UtilNBAMLDollar {
     
-    private UtilNBALDollar() {
+    private UtilNBAMLDollar() {
         
     }
     /**

@@ -14,7 +14,7 @@
 /* You should have received a copy of the GNU General Public License      */
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-package roll.learner.nba.ldollar;
+package roll.learner.nba.mldollar;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
@@ -45,21 +45,21 @@ import roll.words.Word;
  * in TACAS 2008
  * */
 
-public class LearnerNBALDollar extends LearnerBase<NBA>{
+public class LearnerNBAMLDollar extends LearnerBase<NBA>{
     
     private final int dollarLetter;
     private final LearnerDFA dfaLearner;
     private final Automaton nonUPWords;
     
-    public LearnerNBALDollar(Options options, Alphabet alphabet
+    public LearnerNBAMLDollar(Options options, Alphabet alphabet
             , MembershipOracle<HashableValue> membershipOracle) {
         super(options, alphabet, membershipOracle);
         // we have to add a new letter '$' for DFA
         alphabet.addLetter(Alphabet.DOLLAR);
         dollarLetter = alphabet.indexOf(Alphabet.DOLLAR);
-        Automaton allUPWords = UtilNBALDollar.getAllUPWords(alphabet, dollarLetter);
+        Automaton allUPWords = UtilNBAMLDollar.getAllUPWords(alphabet, dollarLetter);
         nonUPWords = allUPWords.complement();
-        MembershipOracleNBALDollar lDollarMembershipOracle = new MembershipOracleNBALDollar(membershipOracle, dollarLetter);
+        MembershipOracleNBAMLDollar lDollarMembershipOracle = new MembershipOracleNBAMLDollar(membershipOracle, dollarLetter);
         if(options.structure.isTable()) {
             dfaLearner = new LearnerDFATableColumn(options, alphabet, lDollarMembershipOracle);
         }else {
@@ -69,7 +69,7 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
 
     @Override
     public LearnerType getLearnerType() {
-        return LearnerType.NBA_LDOLLAR;
+        return LearnerType.NBA_MLDOLLAR;
     }
     
     @Override
@@ -105,13 +105,13 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
         Automaton dkAut1 = DFAOperations.toDkDFA(dfa1);
 
         Automaton mkComplement = mkComplement(dkAut1);
-        Automaton allUpWords = UtilNBALDollar.getAllUPWords(alphabet, dollarLetter);
+        Automaton allUpWords = UtilNBAMLDollar.getAllUPWords(alphabet, dollarLetter);
         Automaton intersection = mkComplement.intersection(allUpWords);
-        Automaton intAsBuchi = UtilNBALDollar.dkDFAToBuchi(intersection);
+        Automaton intAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(intersection);
         Automaton mkMinus = BasicOperations.minus(allUpWords, dkAut);
         NBA buchi = NBAOperations.fromDkNBA(intAsBuchi, alphabet);
 
-        Automaton mkAsBuchi = UtilNBALDollar.dkDFAToBuchi(mkMinus);
+        Automaton mkAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(mkMinus);
         NBA mknbabuchi = NBAOperations.fromDkNBA(mkAsBuchi, alphabet);
         
 
@@ -126,7 +126,7 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
         System.out.println(mknbabuchi.toBA());   
         System.out.println(dfaLearner.toString());   
 
-        Automaton ba = UtilNBALDollar.dkDFAToBuchi(dkAut);
+        Automaton ba = UtilNBAMLDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
 
         System.out.println("----");   

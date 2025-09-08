@@ -129,6 +129,7 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
         Automaton ba = UtilNBALDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
 
+
         System.out.println("----");   
         System.out.println(hypothesis.toBA());
     }
