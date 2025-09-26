@@ -171,6 +171,7 @@ public class Options {
         NFA_RDSTAR,
         NFA_NLSTAR,
         NBA_LDOLLAR,
+        NBA_MLDOLLAR,
         WDBA_MP,
         WDBA_FDFA,
         WDBA_DFA,

@@ -236,6 +236,11 @@ public final class ROLL {
             	options.log.println("(note: output has been converted to state-based automaton)");
             }
             parser.print(options.stats.hypothesis, options.log.getOutputStream());
+
+            if(options.stats.hypothesisMLDollar != null) {
+                System.out.println("MLDOLLAR LEARNING");
+                parser.print(options.stats.hypothesisMLDollar, options.log.getOutputStream());
+            }
         }
         parser.close();
         // output statistics

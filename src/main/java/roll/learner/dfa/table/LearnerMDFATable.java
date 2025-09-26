@@ -26,17 +26,18 @@ import roll.main.Options;
 import roll.oracle.MembershipOracle;
 import roll.query.Query;
 import roll.table.ExprValue;
+import roll.table.ExprValueWord;
 import roll.table.HashableValue;
 import roll.table.ObservationRow;
 import roll.table.ObservationTableAbstract;
 import roll.words.Alphabet;
 import roll.words.Word;
 
-public abstract class LearnerDFATable extends LearnerDFA {
+public abstract class LearnerMDFATable extends LearnerDFA {
     
     protected ObservationTableAbstract observationTable;
     
-    public LearnerDFATable(Options options, Alphabet alphabet
+    public LearnerMDFATable(Options options, Alphabet alphabet
             , MembershipOracle<HashableValue> membershipOracle) {
         super(options, alphabet, membershipOracle);
         this.observationTable = getTableInstance();
@@ -82,9 +83,23 @@ public abstract class LearnerDFATable extends LearnerDFA {
         }
         CeAnalyzer analyzer = getCeAnalyzerInstance(exprValue, result);
         analyzer.analyze();
-        observationTable.addColumn(analyzer.getNewExpriment()); // add new experiment
-        processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - 1, 1);
-        processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - 1, 1);
+
+        Word counterExample = exprValue.get();
+        int ceLength = counterExample.length();
+        for (int i = 0; i < ceLength; i++) {
+    
+            Word subword = counterExample.getSubWord(i, ceLength-i);
+            ExprValue newExperiment = new ExprValueWord(subword);
+            observationTable.addColumn(newExperiment);
+
+        }
+
+        processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - ceLength, ceLength);
+        processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - ceLength, ceLength);
+
+        //observationTable.addColumn(analyzer.getNewExpriment()); // add new experiment
+        //processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - 1, 1);
+        //processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - 1, 1);
         
         makeTableClosed();
     }

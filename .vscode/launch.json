@@ -33,7 +33,7 @@
             "projectName": "roll-library",
             "args": [
                 "learn",
-                "-ldollar",
+                "-mldollar",
                 "/home/matthias/projects/master-code/roll-library/src/main/resources/ba/a$ab.ba",
                 "-v", 
                 "2"

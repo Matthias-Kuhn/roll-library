@@ -17,7 +17,6 @@
 package roll.learner.nba.ldollar;
 
 import dk.brics.automaton.Automaton;
-import dk.brics.automaton.BasicOperations;
 import roll.automata.DFA;
 import roll.automata.NBA;
 import roll.automata.operations.DFAOperations;
@@ -100,47 +99,8 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
             }
         }
         // now we construct the NBA
-
-        DFA dfa1 = dfaLearner.getHypothesis();
-        Automaton dkAut1 = DFAOperations.toDkDFA(dfa1);
-
-        Automaton mkComplement = mkComplement(dkAut1);
-        Automaton allUpWords = UtilNBALDollar.getAllUPWords(alphabet, dollarLetter);
-        Automaton intersection = mkComplement.intersection(allUpWords);
-        Automaton intAsBuchi = UtilNBALDollar.dkDFAToBuchi(intersection);
-        Automaton mkMinus = BasicOperations.minus(allUpWords, dkAut);
-        NBA buchi = NBAOperations.fromDkNBA(intAsBuchi, alphabet);
-
-        Automaton mkAsBuchi = UtilNBALDollar.dkDFAToBuchi(mkMinus);
-        NBA mknbabuchi = NBAOperations.fromDkNBA(mkAsBuchi, alphabet);
-        
-
-        //System.out.println(intAsBuchi.toDot());
-        //System.out.println(intersection); 
-        //System.out.println(allUpWords.toDot()); 
-        System.out.println(dkAut.toDot()); 
-        //
-        System.out.println(mkComplement.toDot()); 
-        //System.out.println(buchi.toBA());
-        //System.out.println("----");   
-        System.out.println(mknbabuchi.toBA());   
-        System.out.println(dfaLearner.toString());   
-
         Automaton ba = UtilNBALDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
-
-
-        System.out.println("----");   
-        System.out.println(hypothesis.toBA());
-    }
-
-    private Automaton mkComplement(Automaton input) {
-        Automaton result = input.clone();
-        for (dk.brics.automaton.State state: result.getStates()) {
-            state.setAccept(!state.isAccept());
-            
-        }
-        return result;
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package roll.main;
 
+import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -34,6 +35,7 @@ import roll.learner.nba.lomega.LearnerWDBALOmega;
 import roll.learner.nba.lomega.LearnerWDBALOmega2;
 import roll.learner.nba.lomega.LearnerTDBALOmega;
 import roll.learner.nba.lomega.UtilLOmega;
+import roll.learner.nba.mldollar.LearnerNBAMLDollar;
 import roll.oracle.Teacher;
 import roll.oracle.nba.TeacherNBA;
 import roll.oracle.nba.TeacherNBAImpl;
@@ -115,6 +117,10 @@ public class Executor {
             LearnerNBALDollar learnerLDollar = (LearnerNBALDollar)learner;
             DFA dfa = learnerLDollar.getLearnerDFA().getHypothesis();
             options.stats.numOfStatesInLeading = dfa.getStateSize();
+        }else if(learner instanceof LearnerNBAMLDollar) {
+            LearnerNBAMLDollar learnerLDollar = (LearnerNBAMLDollar)learner;
+            DFA dfa = learnerLDollar.getLearnerDFA().getHypothesis();
+            options.stats.numOfStatesInLeading = dfa.getStateSize();
         }else if (learner instanceof LearnerWDBAMP){
         	LearnerWDBAMP learnerMP = (LearnerWDBAMP)learner;
             NBA nba = learnerMP.getHypothesis();
@@ -185,6 +191,8 @@ public class Executor {
         LearnerBase<?> learner = null;
         if(options.algorithm == Options.Algorithm.NBA_LDOLLAR) {
             learner = new LearnerNBALDollar(options, alphabet, teacher);
+        }else if(options.algorithm == Options.Algorithm.NBA_MLDOLLAR) {
+            learner = new LearnerNBAMLDollar(options, alphabet, teacher);
         }else if (options.algorithm == Options.Algorithm.WDBA_MP) {
         	learner = new LearnerWDBAMP(options, alphabet, teacher);
         }else if (options.algorithm == Options.Algorithm.WDBA_FDFA) {

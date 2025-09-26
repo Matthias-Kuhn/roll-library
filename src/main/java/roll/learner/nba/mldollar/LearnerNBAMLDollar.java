@@ -26,7 +26,7 @@ import roll.automata.operations.NBAOperations;
 import roll.learner.LearnerBase;
 import roll.learner.LearnerDFA;
 import roll.learner.LearnerType;
-import roll.learner.dfa.table.LearnerDFATableColumn;
+import roll.learner.dfa.table.LearnerMDFATableColumn;
 import roll.learner.dfa.tree.LearnerDFATreeColumn;
 import roll.main.Options;
 import roll.oracle.MembershipOracle;
@@ -61,7 +61,7 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         nonUPWords = allUPWords.complement();
         MembershipOracleNBAMLDollar lDollarMembershipOracle = new MembershipOracleNBAMLDollar(membershipOracle, dollarLetter);
         if(options.structure.isTable()) {
-            dfaLearner = new LearnerDFATableColumn(options, alphabet, lDollarMembershipOracle);
+            dfaLearner = new LearnerMDFATableColumn(options, alphabet, lDollarMembershipOracle);
         }else {
             dfaLearner = new LearnerDFATreeColumn(options, alphabet, lDollarMembershipOracle);
         }
@@ -118,19 +118,22 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         //System.out.println(intAsBuchi.toDot());
         //System.out.println(intersection); 
         //System.out.println(allUpWords.toDot()); 
-        System.out.println(dkAut.toDot()); 
+        //System.out.println(dkAut.toDot()); 
         //
-        System.out.println(mkComplement.toDot()); 
+        //System.out.println(mkComplement.toDot()); 
         //System.out.println(buchi.toBA());
         //System.out.println("----");   
-        System.out.println(mknbabuchi.toBA());   
-        System.out.println(dfaLearner.toString());   
+        //System.out.println(mknbabuchi.toBA());   
+        //System.out.println(dfaLearner.toString());   
+
+        options.stats.hypothesisMLDollar = mknbabuchi;
 
         Automaton ba = UtilNBAMLDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
 
-        System.out.println("----");   
-        System.out.println(hypothesis.toBA());
+        //System.out.println("----");   
+        //System.out.println("LDOLLAR");   
+        //System.out.println(hypothesis.toBA());
     }
 
     private Automaton mkComplement(Automaton input) {

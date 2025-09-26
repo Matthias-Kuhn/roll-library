@@ -269,6 +269,10 @@ public class CLParser {
                 options.algorithm = Options.Algorithm.NBA_LDOLLAR;
                 continue;
             }
+            if(args[i].compareTo("-mldollar") == 0) {
+                options.algorithm = Options.Algorithm.NBA_MLDOLLAR;
+                continue;
+            }
             if(args[i].compareTo("-mp") == 0) {
                 options.algorithm = Options.Algorithm.WDBA_MP;
                 options.automaton = Options.TargetAutomaton.WDBA;

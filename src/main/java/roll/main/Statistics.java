@@ -68,6 +68,8 @@ public class Statistics {
     private final Options options;
     
     public NBA hypothesis;
+
+    public NBA hypothesisMLDollar;
     
     public Statistics(Options options) {
         this.options = options;
