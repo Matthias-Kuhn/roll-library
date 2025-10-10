@@ -203,6 +203,25 @@ public final class ROLL {
         InteractiveMode.interact(options);
     }
     
+    public static void runLearningClean(Options options) {
+        Timer timer = new Timer();
+        timer.start();
+        // prepare the parser
+        Parser parser = UtilParser.prepare(options, options.inputFile, options.format);
+        NBA target = parser.parse();
+        options.stats.numOfLetters = target.getAlphabetSize();
+        options.stats.numOfStatesInTraget = target.getStateSize();
+        // learn the target automaton
+        Executor.executeRABIT(options, target);
+        
+        timer.stop();
+        options.stats.timeInTotal = timer.getTimeElapsed();
+        parser.close();
+        // output statistics
+        options.stats.numOfTransInTraget = NFAOperations.getNumberOfTransitions(target);
+        options.stats.numOfTransInHypothesis = NFAOperations.getNumberOfTransitions(options.stats.hypothesis);
+    }
+
     public static void runLearningMode(Options options, boolean sampling) {
 
         Timer timer = new Timer();

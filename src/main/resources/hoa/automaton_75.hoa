@@ -1,0 +1,30 @@
+HOA: v1
+tool: "BuechiC"
+properties: explicit-labels state-acc trans-labels 
+States: 5
+Start: 0
+acc-name: Buchi
+Acceptance: 1 Inf(0)
+AP: 2 "p" "q"
+--BODY--
+State: 4
+State: 3
+State: 2 {0}
+[((!0&(!1)))]  3
+State: 1
+[((0 & (!1)))]  3
+[((0 & (!1)))]  2
+[((0 & (1)))]  3
+[((0 & (1)))]  0
+[((!0&(!1)))]  3
+[((!0&(!1)))]  0
+State: 0 {0}
+[((0 & (!1)))]  4
+[((0 & (!1)))]  1
+[((0 & (1)))]  4
+[((0 & (1)))]  1
+[((!0&(1)))]  4
+[((!0&(1)))]  1
+[((!0&(!1)))]  1
+
+--END--

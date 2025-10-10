@@ -108,6 +108,7 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         Automaton allUpWords = UtilNBAMLDollar.getAllUPWords(alphabet, dollarLetter);
         Automaton intersection = mkComplement.intersection(allUpWords);
         Automaton intAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(intersection);
+        
         Automaton mkMinus = BasicOperations.minus(allUpWords, dkAut);
         NBA buchi = NBAOperations.fromDkNBA(intAsBuchi, alphabet);
 
@@ -122,14 +123,16 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         //
         //System.out.println(mkComplement.toDot()); 
         //System.out.println(buchi.toBA());
-        //System.out.println("----");   
+        System.out.println("----");   
         //System.out.println(mknbabuchi.toBA());   
         //System.out.println(dfaLearner.toString());   
 
         options.stats.hypothesisMLDollar = mknbabuchi;
+        
 
         Automaton ba = UtilNBAMLDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
+        options.stats.hypothesis = hypothesis;
 
         //System.out.println("----");   
         //System.out.println("LDOLLAR");   
@@ -140,7 +143,6 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         Automaton result = input.clone();
         for (dk.brics.automaton.State state: result.getStates()) {
             state.setAccept(!state.isAccept());
-            
         }
         return result;
     }

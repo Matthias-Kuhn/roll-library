@@ -90,7 +90,10 @@ public abstract class LearnerMDFATable extends LearnerDFA {
     
             Word subword = counterExample.getSubWord(i, ceLength-i);
             ExprValue newExperiment = new ExprValueWord(subword);
-            observationTable.addColumn(newExperiment);
+            if (observationTable.getColumnIndex(newExperiment) == -1) {
+                observationTable.addColumn(newExperiment);
+            }
+            
 
         }
 

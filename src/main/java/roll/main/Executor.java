@@ -20,16 +20,23 @@ import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import automata.FiniteAutomaton;
+import dk.brics.automaton.Automaton;
+import oracle.IntersectionCheck;
 import roll.automata.DFA;
 import roll.automata.FDFA;
 import roll.automata.NBA;
 import roll.automata.NFA;
 import roll.automata.TDBA;
+import roll.automata.operations.DFAOperations;
+import roll.automata.operations.NBAIntersectCheck;
 import roll.automata.operations.NBAOperations;
 import roll.learner.LearnerBase;
 import roll.learner.fdfa.LearnerFDFA;
 import roll.learner.nba.ldollar.LearnerNBALDollar;
 import roll.learner.nba.mp.LearnerWDBAMP;
+import roll.main.inclusion.UtilInclusion;
+import roll.main.ltlf2dfa.NFAIntersectionCheck;
 import roll.learner.nba.lomega.LearnerNBALOmega;
 import roll.learner.nba.lomega.LearnerWDBALOmega;
 import roll.learner.nba.lomega.LearnerWDBALOmega2;
@@ -132,6 +139,68 @@ public class Executor {
             throw new UnsupportedOperationException("Unsupported BA Learner");
         }
         options.stats.hypothesis = hypothesis;
+    }
+
+    private static void executeCustomComplement(Options options, NBA target, TeacherNBA teacher) {
+        if (options.automaton == Options.TargetAutomaton.WDBA && (!target.isDeterministic() || !target.isWeak())) {
+    		throw new RuntimeException("Called weak DBA learner but input is not weak DBA");
+    	}
+    	if (options.automaton == Options.TargetAutomaton.TDBA && (!target.isDeterministic())) {
+    		throw new RuntimeException("Called DBA learner but input is not deterministic");
+    	}
+        LearnerBase<?> learner = getLearner(options, target.getAlphabet(), teacher);
+        Timer timer = new Timer();
+//        NBAOperations.outputCode(target);
+        options.log.println("Initializing learner...");
+        timer.start();
+        learner.startLearning();
+        timer.stop();
+        options.stats.timeOfLearner += timer.getTimeElapsed();
+        NBA hypothesis = null;
+//        options.log.println(target.toString());
+        while(true) {
+            options.log.verbose("Table/Tree is both closed and consistent\n" + learner.toString());
+            NFA model = (NFA)learner.getHypothesis();
+            hypothesis = getNBA(model);
+            // record the maximal number of states in progress DFAs
+            computeMaxProStates(options, learner);
+            // along with ce
+            options.log.println("Resolving equivalence query for hypothesis (#Q=" + hypothesis.getStateSize() + ")...  ");
+            Query<HashableValue> ceQuery = teacher.answerEquivalenceQuery(hypothesis);
+            boolean isEq = ceQuery.getQueryAnswer().get();
+            if(isEq) {
+                // store statistics
+                FiniteAutomaton rBF = UtilInclusion.toRABITNBA(options.stats.hypothesisMLDollar);
+                FiniteAutomaton rB = UtilInclusion.toRABITNBA(options.stats.hypothesis);
+                
+                NBAIntersectCheck check = new NBAIntersectCheck(options.stats.hypothesis, options.stats.hypothesisMLDollar);
+                
+        
+                IntersectionCheck checker = new IntersectionCheck(rBF, rB);
+                //        NBAIntersectionCheck interCheck = new NBAIntersectionCheck(BF, B, true);
+                //        boolean isEmpty = interCheck.isEmpty();
+                boolean isEmpty = check.isEmpty(); 
+                options.log.println("LDollar empty: "+ isEmpty );
+                prepareStats(options, learner, hypothesis);
+                break;
+            }
+            ceQuery.answerQuery(null);
+            options.log.verbose("Counterexample is: " + ceQuery.toString());
+            timer.start();
+            options.log.println("Refining current hypothesis...");
+            learner.refineHypothesis(ceQuery);
+            timer.stop();
+            options.stats.timeOfLearner += timer.getTimeElapsed();
+        }
+        options.log.println("Learning completed...");
+        if (options.automaton.isTDBA()) {
+        	options.log.println("Learned TDBA:");
+        	LearnerTDBALOmega learnerDBA = (LearnerTDBALOmega)learner;
+        	TDBA model = learnerDBA.getHypothesis();
+        	options.log.println(model.toString(IntStream.range(0, target.getAlphabetSize())
+                    .mapToObj(String::valueOf)
+                    .collect(Collectors.toList())));
+        }
     }
     
     private static void execute(Options options, NBA target,
