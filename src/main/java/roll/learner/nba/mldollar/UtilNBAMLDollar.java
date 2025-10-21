@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import dk.brics.automaton.Automaton;
+import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import roll.automata.operations.DFAOperations;
@@ -131,6 +132,47 @@ public class UtilNBAMLDollar {
         return result;
     }
 
+    public static Automaton dkDFAToBüchi2(Automaton dollarAut) {
+        // Get the set Q_$ of states before a dollar-state:
+        Map<State, State> spairs = new HashMap<>();
+        LinkedList<State> qDollar = getLeadingStates(dollarAut, spairs);
+
+        Automaton result = new Automaton();
+        
+        for (State q : qDollar) {
+            Automaton Mq = copyDkFA(dollarAut, dollarAut.getInitialState(), Collections.singleton(q));
+
+            State startAfterDollar = spairs.get(q);
+            for (State qf : dollarAut.getAcceptStates()) {
+              Automaton D1 = copyDkFA(dollarAut, q, Collections.singleton(q));
+              Automaton D2 = copyDkFA(dollarAut, startAfterDollar, Collections.singleton(qf));
+              Automaton D3 = copyDkFA(dollarAut, qf, Collections.singleton(qf));
+            
+              Automaton N = D1.intersection(D2).intersection(D3);
+              N.removeDeadTransitions();
+              if (N.getAcceptStates().isEmpty()) continue;
+            
+              // mache N omega-fähig: add ε von jedem Accept(N) zu Initial(N)
+              Automaton Nomega = DFAOperations.addEpsilon(N);
+            
+              // verbinde Mq-Akzeptoren per ε mit Initial(Nomega)
+              for (State f : Mq.getAcceptStates()) {
+                 for (Transition t : Nomega.getInitialState().getTransitions()) {
+                     f.addTransition(new Transition(t.getMin(), t.getMax(), t.getDest()));
+                 }
+              }
+          
+              // setze Büchi-Akzeptoren = AcceptStates(Nomega)
+              // füge Mq+Nomega in die Gesamtkonstruktion (Union)
+              //result = result.union(Mq_with_Nomega_component);
+            }
+        }
+
+        result.removeDeadTransitions();
+
+        return null;
+    }
+
     public static Automaton dkDFAToBuchi(Automaton dollarAut) {
         Map<State, State> spairs = new HashMap<>();
         LinkedList<State> leadingStates = getLeadingStates(dollarAut, spairs);
@@ -184,4 +226,83 @@ public class UtilNBAMLDollar {
         return dollarAut;
     }
 
+    public static void main(String[] args) {
+        State s0 = new State(); // Startzustand
+        State s1 = new State();
+        State s2 = new State(); // Endzustand
+        State s3 = new State(); 
+        State s4 = new State(); 
+        State s5 = new State(); 
+        State s6 = new State(); 
+        State s7 = new State(); 
+        State s8 = new State(); 
+
+        // Endzustand markieren
+        s8.setAccept(true);
+        s4.setAccept(true);
+
+        // Übergänge definieren
+        s0.addTransition(new Transition('a', s1));
+        s1.addTransition(new Transition('$', s2));
+        s1.addTransition(new Transition('a', s5));
+        s2.addTransition(new Transition('a', s3));
+        s3.addTransition(new Transition('b', s4));
+        s4.addTransition(new Transition('a', s3));
+        s5.addTransition(new Transition('b', s1));
+        s5.addTransition(new Transition('$', s6));
+        s6.addTransition(new Transition('b', s7));
+        s7.addTransition(new Transition('a', s8));
+        s8.addTransition(new Transition('b', s7));
+        
+
+        // Automaten erstellen
+        Automaton automaton = new Automaton();
+        automaton.setInitialState(s0);
+
+        // Optional: deterministisch machen (sollte es hier schon sein)
+        automaton.determinize();
+
+        Automaton mkUp = mkUPWords();
+
+        Automaton myTest = BasicOperations.minus(mkUp, automaton);
+
+        dkDFAToBuchi(automaton);
+
+        
+    }
+
+    public static Automaton mkUPWords() {
+        State s0 = new State(); // Startzustand
+        State s1 = new State();
+        State s2 = new State(); // Endzustand
+
+        // Endzustand markieren
+        s2.setAccept(true);
+
+        // Übergänge definieren
+        s0.addTransition(new Transition('$', s1));
+        s0.addTransition(new Transition('a', s0));
+        s0.addTransition(new Transition('b', s0));
+        s0.addTransition(new Transition('c', s0));
+        s0.addTransition(new Transition('d', s0));
+        s1.addTransition(new Transition('a', s2));
+        s1.addTransition(new Transition('b', s2));
+        s1.addTransition(new Transition('c', s2));
+        s1.addTransition(new Transition('d', s2));
+        s2.addTransition(new Transition('a', s2));
+        s2.addTransition(new Transition('b', s2));
+        s2.addTransition(new Transition('c', s2));
+        s2.addTransition(new Transition('d', s2));
+
+        // Automaten erstellen
+        Automaton automaton = new Automaton();
+        automaton.setInitialState(s0);
+
+        // Optional: deterministisch machen (sollte es hier schon sein)
+        automaton.determinize();
+
+        return automaton;
+    }
+
 }
+

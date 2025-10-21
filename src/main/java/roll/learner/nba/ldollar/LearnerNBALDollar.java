@@ -17,6 +17,7 @@
 package roll.learner.nba.ldollar;
 
 import dk.brics.automaton.Automaton;
+import dk.brics.automaton.BasicOperations;
 import roll.automata.DFA;
 import roll.automata.NBA;
 import roll.automata.operations.DFAOperations;
@@ -27,6 +28,7 @@ import roll.learner.LearnerDFA;
 import roll.learner.LearnerType;
 import roll.learner.dfa.table.LearnerDFATableColumn;
 import roll.learner.dfa.tree.LearnerDFATreeColumn;
+import roll.learner.nba.mldollar.UtilNBAMLDollar;
 import roll.main.Options;
 import roll.oracle.MembershipOracle;
 import roll.query.Query;
@@ -81,10 +83,12 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
     protected void constructHypothesis() {
         
         Automaton dkAut;
+        Automaton copyDkAut;
         while(true) {
             // first check whether it is a subset of E*$E+
             DFA dfa = dfaLearner.getHypothesis();
             dkAut = DFAOperations.toDkDFA(dfa);
+            copyDkAut = dkAut.clone();
             Automaton dkAutInter = dkAut.intersection(nonUPWords);
             String counterexample = dkAutInter.getShortestExample(true);
             if (counterexample != null) {
@@ -101,6 +105,21 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
         // now we construct the NBA
         Automaton ba = UtilNBALDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
+
+        //--
+        options.stats.ldollarHypo = dollarComplement(copyDkAut);
+        //Automaton dollarComp = dollarComplement(dkAut);
+        //Automaton dcBA = UtilNBALDollar.dkDFAToBuchi(dollarComp);
+        //NBA test = NBAOperations.fromDkNBA(dcBA, alphabet);
+        //options.stats.dollarCompHypothesis = NBAOperations.fromDkNBA(dcBA, alphabet);
+        //--
+
+        //System.out.println(dkAut);
+    }
+
+    private Automaton dollarComplement(Automaton input) {
+        Automaton allUpWords = UtilNBAMLDollar.getAllUPWords(alphabet, dollarLetter);
+        return BasicOperations.minus(allUpWords, input);
     }
 
     @Override

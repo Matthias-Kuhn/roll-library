@@ -45,15 +45,18 @@ import roll.learner.nba.lomega.UtilLOmega;
 import roll.learner.nba.mldollar.LearnerNBAMLDollar;
 import roll.oracle.Teacher;
 import roll.oracle.nba.TeacherNBA;
+import roll.oracle.nba.TeacherNBAComp;
 import roll.oracle.nba.TeacherNBAImpl;
 import roll.oracle.nba.TeacherTDBAImpl;
 //import roll.oracle.nba.rabit.TeacherNBARABIT;
 import roll.oracle.nba.sampler.TeacherNBASampler;
 //import roll.oracle.nba.spot.TeacherNBASpot;
 import roll.query.Query;
+import roll.query.QuerySimple;
 import roll.table.HashableValue;
 import roll.util.Timer;
 import roll.words.Alphabet;
+import roll.words.Word;
 
 /**
  * @author Yong Li (liyong@ios.ac.cn)
@@ -69,7 +72,7 @@ public class Executor {
     			&& !options.spot) {
     		teacher = new TeacherTDBAImpl(options, target);
     	}else {
-    		teacher = new TeacherNBAImpl(options, target);
+    		teacher = new TeacherNBAComp(options, target);
     	}
         Executor.execute(options, target, teacher);
     }
@@ -232,6 +235,7 @@ public class Executor {
             Query<HashableValue> ceQuery = teacher.answerEquivalenceQuery(hypothesis);
             boolean isEq = ceQuery.getQueryAnswer().get();
             if(isEq) {
+
                 // store statistics
                 prepareStats(options, learner, hypothesis);
                 break;

@@ -19,6 +19,7 @@ package roll.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.brics.automaton.Automaton;
 import roll.automata.NBA;
 
 /**
@@ -70,6 +71,11 @@ public class Statistics {
     public NBA hypothesis;
 
     public NBA hypothesisMLDollar;
+
+    public NBA dollarCompHypothesis;
+    public Automaton ldollarHypo;
+
+    public String mkMessage;
     
     public Statistics(Options options) {
         this.options = options;

@@ -4,7 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "java",
+            "name": "UtilNBAMLDollar",
+            "request": "launch",
+            "mainClass": "roll.learner.nba.mldollar.UtilNBAMLDollar",
+            "projectName": "roll-library"
+        },
         {
             "type": "java",
             "name": "Current File",
@@ -34,8 +40,8 @@
             "args": [
                 "learn",
                 "-ldollar",
-                "/home/matthias/projects/master-code/roll-library/src/main/resources/ba/75.ba",
-                "-v", 
+                "/home/matthias/projects/master-code/roll-library/src/main/resources/hoa/automaton_94.hoa",
+                "-v",
                 "2"
             ]
         },
