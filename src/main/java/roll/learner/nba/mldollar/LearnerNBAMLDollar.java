@@ -18,12 +18,15 @@ package roll.learner.nba.mldollar;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import automata.FiniteAutomaton;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
 import dk.brics.automaton.Transition;
+import oracle.IntersectionCheck;
 import roll.automata.DFA;
 import roll.automata.NBA;
 import roll.automata.operations.DFAOperations;
@@ -37,6 +40,7 @@ import roll.learner.dfa.table.LearnerMDFATableColumn;
 import roll.learner.dfa.tree.LearnerDFATreeColumn;
 import roll.learner.nba.ldollar.UtilNBALDollar;
 import roll.main.Options;
+import roll.main.inclusion.UtilInclusion;
 import roll.oracle.MembershipOracle;
 import roll.parser.Format;
 import roll.parser.Parser;
@@ -44,6 +48,7 @@ import roll.parser.UtilParser;
 import roll.query.Query;
 import roll.query.QuerySimple;
 import roll.table.HashableValue;
+import roll.util.Pair;
 import roll.words.Alphabet;
 import roll.words.Word;
 import dk.brics.automaton.State;
@@ -90,10 +95,24 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         constructHypothesis();
     }
 
+    public static Pair<Word, Word> getCounterexample(Alphabet alphabet, List<String> prefix, List<String> suffix) {
+        int[] pre = new int[prefix.size()];
+        for(int i = 0; i < pre.length; i ++) {
+            pre[i] = alphabet.indexOf(prefix.get(i).charAt(0));
+        }
+        int[] suf = new int[suffix.size()];
+        for(int i = 0; i < suf.length; i ++) {
+            suf[i] = alphabet.indexOf(suffix.get(i).charAt(0));
+        }
+        return new Pair<>(alphabet.getArrayWord(pre), alphabet.getArrayWord(suf));
+    }
+
     @Override
     protected void constructHypothesis() {
         
         Automaton dkAut;
+        String counterexampleString = null;
+        Query<HashableValue> myQuery = null;
         while(true) {
             // first check whether it is a subset of E*$E+
             DFA dfa = dfaLearner.getHypothesis();
@@ -102,33 +121,73 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
             String counterexample = dkAutInter.getShortestExample(true);
             if (counterexample != null) {
                 // there is some word not in E*$E+
+                System.out.print("Wrong Form CE: ");
+                System.out.println(counterexample);
                 Word word = alphabet.getWordFromString(counterexample);
                 Query<HashableValue> ceQuery = new QuerySimple<>(word, alphabet.getEmptyWord());
                 ceQuery.answerQuery(getHashableValueBoolean(false));
                 dfaLearner.refineHypothesis(ceQuery);
-            }else {
+            } else {
                 // DFA accepts a subset of E*$E+
-                //DFA testSaturation = dfaLearner.getHypothesis();
-                //Automaton satDk = DFAOperations.toDkDFA(testSaturation);
-//
-                //Automaton dcSatDk = dollarComplement(satDk);
-//
-                //Automaton satAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(satDk);
-                //Automaton dcSatAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(dcSatDk);
-//
-                //Automaton satInter = satAsBuchi.intersection(dcSatAsBuchi);
-                //String satCounterExample = satInter.getShortestExample(true);
-                //if (satCounterExample != null) {
-                //    Word word = alphabet.getWordFromString(satCounterExample);
-                //    Query<HashableValue> ceQuery = new QuerySimple<>(word, alphabet.getEmptyWord());
-                //    ceQuery.answerQuery(getHashableValueBoolean(false));
-                //    dfaLearner.refineHypothesis(ceQuery);
-                //} else {
-                //    break;
-                //}
-                break;
 
+                DFA testSaturation = dfaLearner.getHypothesis();
+                Automaton satDk = DFAOperations.toDkDFA(testSaturation);
+                Automaton dcSatDk = dollarComplement(satDk);
+
+                Automaton satAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(satDk);
+                Automaton dcSatAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(dcSatDk);
                 
+
+                NBA hypoNBA = NBAOperations.fromDkNBA(satAsBuchi, alphabet);
+                NBA dcHypoNBA = NBAOperations.fromDkNBA(dcSatAsBuchi, alphabet);
+
+                FiniteAutomaton rhyp = UtilInclusion.toRABITNBA(hypoNBA);
+                FiniteAutomaton rtar = UtilInclusion.toRABITNBA(dcHypoNBA);
+
+                IntersectionCheck checker = new IntersectionCheck(rhyp, rtar);
+                boolean isEmpty = checker.checkEmptiness();
+
+                if (!isEmpty) {
+                    checker.computePath();
+                    Pair<Word, Word> pair = getCounterexample(alphabet, checker.getPrefix(), checker.getSuffix());
+                    Word prefix = pair.getLeft();
+                    Word suffix = pair.getRight();
+
+                    System.out.println(prefix);
+                    System.out.println(suffix);
+
+                    Query<HashableValue> ceQuery = new QuerySimple<>(prefix,suffix);
+                    ceQuery.answerQuery(getHashableValueBoolean(false));
+                    
+                    options.log.println("Analyzing counterexample for DFA learner...");
+                    Automaton result = FDFAOperations.buildDDollar(prefix, suffix);
+                    // System.out.println(result.toString());
+                    String counterexampleStr = null;
+                    DFA dfa1 = dfaLearner.getHypothesis();
+                    Automaton dkAut1 = DFAOperations.toDkDFA(dfa1);
+                    //System.out.println(dkAut.toString());
+                    HashableValue answer = null;
+                    if(answer == null) {
+                        answer = membershipOracle.answerMembershipQuery(ceQuery);
+                    }
+                    if (answer.isAccepting()) {
+                        counterexampleStr = result.minus(dkAut1).getShortestExample(true);
+                    } else {
+                        counterexampleStr = dkAut.intersection(result).getShortestExample(true);
+                    }
+                    options.log.verbose("counterexample: " + counterexampleStr);
+                    options.log.verbose("accepting: " + answer.isAccepting());
+                    Word word = alphabet.getWordFromString(counterexampleStr);
+                    Query<HashableValue> query = new QuerySimple<>(word, alphabet.getEmptyWord());
+                    query.answerQuery(answer);
+                    myQuery = ceQuery;
+                    counterexampleString = counterexampleStr;
+                    dfaLearner.refineHypothesis(query);;
+                    
+
+                } else {
+                    break;
+                }
             }
         }
         // now we construct the NBA
@@ -217,56 +276,45 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         //System.out.println("----");   
         //System.out.println("LDOLLAR");   
         //System.out.println(hypothesis.toBA());
+
+        //if(counterexampleString != null && myQuery != null) {
+        //    refineHypothesis(myQuery);
+        //}
+
+        DFA testSaturation = dfaLearner.getHypothesis();
+        Automaton satDk = DFAOperations.toDkDFA(testSaturation);
+        Automaton dcSatDk = dollarComplement(satDk);
+
+        Automaton satAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(satDk);
+        Automaton dcSatAsBuchi = UtilNBAMLDollar.dkDFAToBuchi(dcSatDk);
+        
+
+        NBA hypoNBA = NBAOperations.fromDkNBA(satAsBuchi, alphabet);
+        NBA dcHypoNBA = NBAOperations.fromDkNBA(dcSatAsBuchi, alphabet);
+
+        FiniteAutomaton rhyp = UtilInclusion.toRABITNBA(hypoNBA);
+        FiniteAutomaton rtar = UtilInclusion.toRABITNBA(dcHypoNBA);
+
+        IntersectionCheck checker = new IntersectionCheck(rhyp, rtar);
+        boolean isEmpty = checker.checkEmptiness();
+
+        if (!isEmpty) {
+            checker.computePath();
+            Pair<Word, Word> pair = getCounterexample(alphabet, checker.getPrefix(), checker.getSuffix());
+            Word prefix = pair.getLeft();
+            Word suffix = pair.getRight();
+
+            System.out.println(prefix);
+            System.out.println(suffix);
+
+            Query<HashableValue> ceQuery = new QuerySimple<>(prefix,suffix);
+            ceQuery.answerQuery(getHashableValueBoolean(false));
+            //refineHypothesis(ceQuery);
+        }
+
     }
 
-    public static Automaton removeSelfLoopsAtDollarStates(Automaton aut) {
-        aut.determinize();
-        Set<State> dollarStates = new HashSet<>();
-
-        // 1. Finde Dollar-Zustände
-        for (State s : aut.getStates()) {
-            for (Transition t : s.getTransitions()) {
-                if (t.getMin() == '$' && t.getMax() == '$') {
-                    dollarStates.add(t.getDest());
-                }
-            }
-        }
-
-        // 2. Erzeuge Kopien für Selbstloops
-        Map<State, State> copies = new HashMap<>();
-        for (State q : dollarStates) {
-            State copy = new State();
-            if (q.isAccept()) copy.setAccept(true);
-            copies.put(q, copy);
-        }
-
-        // 3. Übergänge anpassen
-        for (State q : aut.getStates()) {
-            Set<Transition> transitions = new HashSet<>(q.getTransitions());
-            q.getTransitions().clear();
-
-            for (Transition t : transitions) {
-                if (dollarStates.contains(q) && t.getDest() == q) {
-                    // war Selbstloop in Dollarzustand
-                    State copy = copies.get(q);
-                    q.addTransition(new Transition(t.getMin(), t.getMax(), copy));
-                } else {
-                    q.addTransition(t);
-                }
-            }
-        }
-
-        // 4. Übergänge für Kopien übernehmen
-        for (Map.Entry<State, State> e : copies.entrySet()) {
-            State orig = e.getKey();
-            State copy = e.getValue();
-            for (Transition t : orig.getTransitions()) {
-                copy.addTransition(new Transition(t.getMin(), t.getMax(), t.getDest()));
-            }
-        }
-
-        return aut;
-    }
+    
 
     private Automaton dollarComplement(Automaton input) {
         Automaton allUpWords = UtilNBAMLDollar.getAllUPWords(alphabet, dollarLetter);

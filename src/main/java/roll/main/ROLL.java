@@ -39,6 +39,7 @@ import roll.learner.fdfa.LearnerFDFA;
 import roll.learner.nba.lomega.UtilLOmega;
 import roll.learner.nba.lomega.translator.TranslatorFDFA;
 import roll.learner.nba.lomega.translator.TranslatorFDFAUnder;
+import roll.main.Options.ComplementFlag;
 import roll.main.complement.TeacherNBAComplement;
 import roll.main.complement.algos.ComplementCongruence;
 import roll.main.complement.algos.ComplementCongruenceOpt;
@@ -101,7 +102,11 @@ public final class ROLL {
             break;
         case COMPLEMENTING:
             options.log.info("ROLL for BA complementation...");
-            runComplementingMode(options, true);
+            if (options.cFlag != ComplementFlag.NONE) {
+                runLearningMode(options, false);
+            } else {
+                runComplementingMode(options, true);
+            }
             break;
         case INCLUDING:
             options.log.info("ROLL for BA inclusion testing...");

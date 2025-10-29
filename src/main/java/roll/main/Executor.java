@@ -35,6 +35,9 @@ import roll.learner.LearnerBase;
 import roll.learner.fdfa.LearnerFDFA;
 import roll.learner.nba.ldollar.LearnerNBALDollar;
 import roll.learner.nba.mp.LearnerWDBAMP;
+import roll.main.Options.Algorithm;
+import roll.main.Options.ComplementFlag;
+import roll.main.Options.RunningMode;
 import roll.main.inclusion.UtilInclusion;
 import roll.main.ltlf2dfa.NFAIntersectionCheck;
 import roll.learner.nba.lomega.LearnerNBALOmega;
@@ -72,7 +75,13 @@ public class Executor {
     			&& !options.spot) {
     		teacher = new TeacherTDBAImpl(options, target);
     	}else {
-    		teacher = new TeacherNBAComp(options, target);
+            if (options.cFlag == ComplementFlag.NBA_COMPL_DOLLAR_TEACHER && options.runningMode == RunningMode.COMPLEMENTING) {
+                System.out.println("Complementing using Teacher. Selection of Teacher completed");
+                teacher = new TeacherNBAComp(options, target);
+            } else {
+                teacher = new TeacherNBAImpl(options, target);
+            }
+    		
     	}
         Executor.execute(options, target, teacher);
     }
@@ -172,18 +181,9 @@ public class Executor {
             Query<HashableValue> ceQuery = teacher.answerEquivalenceQuery(hypothesis);
             boolean isEq = ceQuery.getQueryAnswer().get();
             if(isEq) {
+                
+                
                 // store statistics
-                FiniteAutomaton rBF = UtilInclusion.toRABITNBA(options.stats.hypothesisMLDollar);
-                FiniteAutomaton rB = UtilInclusion.toRABITNBA(options.stats.hypothesis);
-                
-                NBAIntersectCheck check = new NBAIntersectCheck(options.stats.hypothesis, options.stats.hypothesisMLDollar);
-                
-        
-                IntersectionCheck checker = new IntersectionCheck(rBF, rB);
-                //        NBAIntersectionCheck interCheck = new NBAIntersectionCheck(BF, B, true);
-                //        boolean isEmpty = interCheck.isEmpty();
-                boolean isEmpty = check.isEmpty(); 
-                options.log.println("LDollar empty: "+ isEmpty );
                 prepareStats(options, learner, hypothesis);
                 break;
             }
@@ -262,9 +262,10 @@ public class Executor {
     public static LearnerBase<?> getLearner(Options options, Alphabet alphabet,
             Teacher<NBA, Query<HashableValue>, HashableValue> teacher) {
         LearnerBase<?> learner = null;
-        if(options.algorithm == Options.Algorithm.NBA_LDOLLAR) {
+        if(options.algorithm == Options.Algorithm.NBA_LDOLLAR|| (options.runningMode == RunningMode.COMPLEMENTING && options.cFlag == ComplementFlag.NBA_COMPL_DOLLAR_TEACHER)) {
             learner = new LearnerNBALDollar(options, alphabet, teacher);
-        }else if(options.algorithm == Options.Algorithm.NBA_MLDOLLAR) {
+        }else if((options.algorithm == Options.Algorithm.NBA_MLDOLLAR) || (options.runningMode == RunningMode.COMPLEMENTING && options.cFlag == ComplementFlag.NBA_COMPL_DOLLAR_LEARNER)) {
+            System.out.println("Complementing using Learner. Learner selected");
             learner = new LearnerNBAMLDollar(options, alphabet, teacher);
         }else if (options.algorithm == Options.Algorithm.WDBA_MP) {
         	learner = new LearnerWDBAMP(options, alphabet, teacher);

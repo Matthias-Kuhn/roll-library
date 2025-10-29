@@ -35,6 +35,9 @@ public class Options {
     
     // learning algorithm
     public Algorithm algorithm = Algorithm.SYNTACTIC;
+
+    // complement flag
+    public ComplementFlag cFlag = ComplementFlag.NONE;
     
     // approximation method for the ultimately periodic words of FDFA
     public Approximation approximation = Approximation.UNDER;
@@ -161,6 +164,12 @@ public class Options {
         public boolean isTable() {
             return this == TABLE;
         }
+    }
+
+    public static enum ComplementFlag {
+        NONE,
+        NBA_COMPL_DOLLAR_TEACHER,
+        NBA_COMPL_DOLLAR_LEARNER,
     }
     
     public static enum Algorithm {

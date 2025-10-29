@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import roll.main.Options.ComplementFlag;
 import roll.parser.Format;
 import roll.util.Pair;
 
@@ -389,6 +390,14 @@ public class CLParser {
             	options.minimization = true;
             	continue;
             }
+            if(args[i].compareTo("-dollarTeacher") == 0) {
+            	options.cFlag = ComplementFlag.NBA_COMPL_DOLLAR_TEACHER;
+            	continue;
+            }
+            if(args[i].compareTo("-dollarLearner") == 0) {
+            	options.cFlag = ComplementFlag.NBA_COMPL_DOLLAR_LEARNER;
+            	continue;
+            }
         }
         
         if(options.runningMode == null) {
@@ -500,6 +509,8 @@ public class CLParser {
         	, new Pair<>("-wdba", "Weak DBA as the learning target via Limit FDFA")
         	, new Pair<>("-wdba2", "Weak DBA as the learning target via learning leading DFA")
         	, new Pair<>("-kb i", "Size of the knowledge base")
+        	, new Pair<>("-dollarTeacher", "Use the ldollar Teacher variant for complementing")
+        	, new Pair<>("-dollarLearner", "Use the ldollar Learner variant for complementing")
         );
         Comparator<Pair<String, String>> comparator = new Comparator<Pair<String, String>>() {
 			@Override

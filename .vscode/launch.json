@@ -38,9 +38,10 @@
             "mainClass": "roll.main.ROLL",
             "projectName": "roll-library",
             "args": [
-                "learn",
-                "-ldollar",
-                "/home/matthias/projects/master-code/roll-library/src/main/resources/hoa/automaton_94.hoa",
+                "complement",
+                "-dollarLearner",
+               // "/home/matthias/projects/master-code/roll-library/src/main/resources/hoa/automaton_75.hoa",
+                "/home/matthias/projects/master-code/roll-library/src/main/resources/ba/75.ba",
                 "-v",
                 "2"
             ]
