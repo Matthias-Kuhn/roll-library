@@ -17,11 +17,7 @@
 package roll.automata.operations;
 
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
 
-import automata.FAState;
-import automata.FiniteAutomaton;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;

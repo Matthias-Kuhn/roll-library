@@ -105,16 +105,7 @@ public class LearnerNBALDollar extends LearnerBase<NBA>{
         // now we construct the NBA
         Automaton ba = UtilNBALDollar.dkDFAToBuchi(dkAut);
         hypothesis = NBAOperations.fromDkNBA(ba, alphabet);
-
-        //--
         options.stats.ldollarHypo = dollarComplement(copyDkAut);
-        //Automaton dollarComp = dollarComplement(dkAut);
-        //Automaton dcBA = UtilNBALDollar.dkDFAToBuchi(dollarComp);
-        //NBA test = NBAOperations.fromDkNBA(dcBA, alphabet);
-        //options.stats.dollarCompHypothesis = NBAOperations.fromDkNBA(dcBA, alphabet);
-        //--
-
-        //System.out.println(dkAut);
     }
 
     private Automaton dollarComplement(Automaton input) {

@@ -40,8 +40,8 @@
             "args": [
                 "complement",
                 "-dollarLearner",
-               // "/home/matthias/projects/master-code/roll-library/src/main/resources/hoa/automaton_75.hoa",
-                "/home/matthias/projects/master-code/roll-library/src/main/resources/ba/75.ba",
+                "/home/matthias/projects/master-code/roll-library/src/main/resources/hoa/automaton_94.hoa",
+                //"/home/matthias/projects/master-code/roll-library/src/main/resources/ba/75.ba",
                 "-v",
                 "2"
             ]

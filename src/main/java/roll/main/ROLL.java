@@ -64,24 +64,11 @@ import roll.words.Word;
  * @author Yong Li (liyong@ios.ac.cn)
  * */
 public final class ROLL {
-
-    public static String[] createCustomArgs() {
-        String[] args = new String[5];
-        args[0] = "learn";
-        args[1] = "/home/matthias/projects/master-code/roll-library/src/main/resources/ba/a$ab.ba";
-        args[2] = "-ldollar";
-        args[3] = "-v";
-        args[4] = "2";
-        
-
-        return args;
-    }
     
     public static void main(String[] args) {
 
        // System.out.println("Default Charset: " + Charset.defaultCharset());
        // System.out.println(System.getProperty("file.encoding"));
-       // args = createCustomArgs();
         // select mode to execute
         CLParser clParser = new CLParser();
         clParser.prepareOptions(args);
@@ -248,7 +235,12 @@ public final class ROLL {
         // output target automaton
         if(options.outputFile != null) {
             try {
-                parser.print(options.stats.hypothesis, new FileOutputStream(new File(options.outputFile)));
+                if (options.stats.hypothesisMLDollar != null) {
+                    parser.print(options.stats.hypothesisMLDollar, new FileOutputStream(new File(options.outputFile)));
+                } else {
+                    parser.print(options.stats.hypothesis, new FileOutputStream(new File(options.outputFile)));
+                }
+                
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -262,7 +254,7 @@ public final class ROLL {
             parser.print(options.stats.hypothesis, options.log.getOutputStream());
 
             if(options.stats.hypothesisMLDollar != null) {
-                System.out.println("MLDOLLAR LEARNING");
+                options.log.println("\nhypothesis automaton (dollar-complement)");
                 parser.print(options.stats.hypothesisMLDollar, options.log.getOutputStream());
             }
         }

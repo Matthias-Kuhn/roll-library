@@ -6,7 +6,6 @@ import automata.FiniteAutomaton;
 import dk.brics.automaton.Automaton;
 import oracle.IntersectionCheck;
 import roll.automata.NBA;
-import roll.automata.operations.FDFAOperations;
 import roll.automata.operations.NBAOperations;
 import roll.learner.nba.ldollar.UtilNBALDollar;
 import roll.main.Options;
@@ -19,11 +18,11 @@ import roll.query.Query;
 import roll.query.QuerySimple;
 import roll.table.HashableValue;
 import roll.table.HashableValueBoolean;
-import roll.table.HashableValueBooleanExactPair;
 import roll.util.Pair;
 import roll.util.Timer;
 import roll.words.Alphabet;
 import roll.words.Word;
+
 
 public class TeacherNBAComp extends TeacherNBA {
 
@@ -88,38 +87,22 @@ public class TeacherNBAComp extends TeacherNBA {
             isEmpty = checker.checkEmptiness();
             t = timer.getCurrentTime() - t;
 
-            if (false) {
-                // we have found counterexample now
-                checker.computePath();
-                Pair<Word, Word> pair = getCounterexample(checker.getPrefix(), checker.getSuffix());
-                prefix = pair.getLeft();
-                suffix = pair.getRight();
-                isEq = false;
-                isInTarget = NBAOperations.accepts(target, prefix, suffix);
-            } else {
-                
-                boolean hasCE = false;
-                
-                /**
-                 * the counterexamples returned from the sampler are nondeterministic,
-                 * we do not encourage nondeterminism in the tool 
-                 * **/
-                boolean nondet = false;
-                if(nondet && sampling) {
-                    options.log.println("Sampling for a counterexample to the inclusion...");
-                    SamplerIndexedMonteCarlo sampler = new SamplerIndexedMonteCarlo(options.epsilon, options.delta);
-                    sampler.K = target.getStateSize();
-                    Query<HashableValue> ceQuery = NBAInclusionSampler.isIncluded(dollarCompHypo, target, sampler);
-                    if (ceQuery != null) {
-                        prefix = ceQuery.getPrefix();
-                        suffix = ceQuery.getSuffix();
-                        isInTarget = false;
-                        isEq = false;
-                        hasCE = true;
-                    }
+            
+            boolean hasCE = false;
+            boolean nondet = false;
+            if(nondet && sampling) {
+                options.log.println("Sampling for a counterexample to the inclusion...");
+                SamplerIndexedMonteCarlo sampler = new SamplerIndexedMonteCarlo(options.epsilon, options.delta);
+                sampler.K = target.getStateSize();
+                Query<HashableValue> ceQuery = NBAInclusionSampler.isIncluded(dollarCompHypo, target, sampler);
+                if (ceQuery != null) {
+                    prefix = ceQuery.getPrefix();
+                    suffix = ceQuery.getSuffix();
+                    isInTarget = false;
+                    isEq = false;
+                    hasCE = true;
                 }
-//            	UtilComplement.print(BFC, "A.ba");
-//            	UtilComplement.print(B, "B.ba");
+                
                 if(! hasCE) {
                     // by rabit
                     options.log.println("RABIT/SPOT/CONGR for a counterexample to the inclusion...");
@@ -129,8 +112,6 @@ public class TeacherNBAComp extends TeacherNBA {
                     
                     boolean isIncluded = included.isIncluded();
                     if (isIncluded) {
-//                    	UtilComplement.print(BFC, "A.ba");
-//                    	UtilComplement.print(B, "B.ba");
                         isEq = true;
                     } else {
                         isInTarget = false;

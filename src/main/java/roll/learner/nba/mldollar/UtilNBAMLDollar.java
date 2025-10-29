@@ -32,9 +32,6 @@ import dk.brics.automaton.Transition;
 import roll.automata.operations.DFAOperations;
 import roll.words.Alphabet;
 
-/**
- * @author Yong Li (liyong@ios.ac.cn)
- * */
 
 public class UtilNBAMLDollar {
     
@@ -132,47 +129,6 @@ public class UtilNBAMLDollar {
         return result;
     }
 
-    public static Automaton dkDFAToBüchi2(Automaton dollarAut) {
-        // Get the set Q_$ of states before a dollar-state:
-        Map<State, State> spairs = new HashMap<>();
-        LinkedList<State> qDollar = getLeadingStates(dollarAut, spairs);
-
-        Automaton result = new Automaton();
-        
-        for (State q : qDollar) {
-            Automaton Mq = copyDkFA(dollarAut, dollarAut.getInitialState(), Collections.singleton(q));
-
-            State startAfterDollar = spairs.get(q);
-            for (State qf : dollarAut.getAcceptStates()) {
-              Automaton D1 = copyDkFA(dollarAut, q, Collections.singleton(q));
-              Automaton D2 = copyDkFA(dollarAut, startAfterDollar, Collections.singleton(qf));
-              Automaton D3 = copyDkFA(dollarAut, qf, Collections.singleton(qf));
-            
-              Automaton N = D1.intersection(D2).intersection(D3);
-              N.removeDeadTransitions();
-              if (N.getAcceptStates().isEmpty()) continue;
-            
-              // mache N omega-fähig: add ε von jedem Accept(N) zu Initial(N)
-              Automaton Nomega = DFAOperations.addEpsilon(N);
-            
-              // verbinde Mq-Akzeptoren per ε mit Initial(Nomega)
-              for (State f : Mq.getAcceptStates()) {
-                 for (Transition t : Nomega.getInitialState().getTransitions()) {
-                     f.addTransition(new Transition(t.getMin(), t.getMax(), t.getDest()));
-                 }
-              }
-          
-              // setze Büchi-Akzeptoren = AcceptStates(Nomega)
-              // füge Mq+Nomega in die Gesamtkonstruktion (Union)
-              //result = result.union(Mq_with_Nomega_component);
-            }
-        }
-
-        result.removeDeadTransitions();
-
-        return null;
-    }
-
     public static Automaton dkDFAToBuchi(Automaton dollarAut) {
         Map<State, State> spairs = new HashMap<>();
         LinkedList<State> leadingStates = getLeadingStates(dollarAut, spairs);
@@ -227,9 +183,9 @@ public class UtilNBAMLDollar {
     }
 
     public static void main(String[] args) {
-        State s0 = new State(); // Startzustand
+        State s0 = new State(); 
         State s1 = new State();
-        State s2 = new State(); // Endzustand
+        State s2 = new State(); 
         State s3 = new State(); 
         State s4 = new State(); 
         State s5 = new State(); 
@@ -237,11 +193,9 @@ public class UtilNBAMLDollar {
         State s7 = new State(); 
         State s8 = new State(); 
 
-        // Endzustand markieren
         s8.setAccept(true);
         s4.setAccept(true);
 
-        // Übergänge definieren
         s0.addTransition(new Transition('a', s1));
         s1.addTransition(new Transition('$', s2));
         s1.addTransition(new Transition('a', s5));
@@ -254,12 +208,9 @@ public class UtilNBAMLDollar {
         s7.addTransition(new Transition('a', s8));
         s8.addTransition(new Transition('b', s7));
         
-
-        // Automaten erstellen
         Automaton automaton = new Automaton();
         automaton.setInitialState(s0);
 
-        // Optional: deterministisch machen (sollte es hier schon sein)
         automaton.determinize();
 
         Automaton mkUp = mkUPWords();
@@ -272,14 +223,13 @@ public class UtilNBAMLDollar {
     }
 
     public static Automaton mkUPWords() {
-        State s0 = new State(); // Startzustand
+        State s0 = new State();
         State s1 = new State();
-        State s2 = new State(); // Endzustand
+        State s2 = new State();
 
-        // Endzustand markieren
         s2.setAccept(true);
 
-        // Übergänge definieren
+       
         s0.addTransition(new Transition('$', s1));
         s0.addTransition(new Transition('a', s0));
         s0.addTransition(new Transition('b', s0));
@@ -294,11 +244,9 @@ public class UtilNBAMLDollar {
         s2.addTransition(new Transition('c', s2));
         s2.addTransition(new Transition('d', s2));
 
-        // Automaten erstellen
+        
         Automaton automaton = new Automaton();
         automaton.setInitialState(s0);
-
-        // Optional: deterministisch machen (sollte es hier schon sein)
         automaton.determinize();
 
         return automaton;
