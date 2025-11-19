@@ -78,7 +78,7 @@ public class TeacherNBAComp extends TeacherNBA {
             Automaton dcBA = UtilNBALDollar.dkDFAToBuchi(ldollarComp);
             NBA dollarCompHypo = NBAOperations.fromDkNBA(dcBA, alphabet);
             //NBA dollarCompHypo = options.stats.dollarCompHypothesis;
-            options.log.println("Checking the intersection for B(F) (" + target.getStateSize() + ") and B(F^c) ("
+            options.log.println("Checking the intersection for B(hypothesis) (" + target.getStateSize() + ") and B(dollar-complement) ("
                     + dollarCompHypo.getStateSize() + ")...");
     
             t = timer.getCurrentTime();
@@ -86,6 +86,16 @@ public class TeacherNBAComp extends TeacherNBA {
             checker = new IntersectionCheck(rdch, rtar);
             isEmpty = checker.checkEmptiness();
             t = timer.getCurrentTime() - t;
+
+            if (false && !isEmpty) {
+                // we have found counterexample now
+                checker.computePath();
+                Pair<Word, Word> pair = getCounterexample(checker.getPrefix(), checker.getSuffix());
+                prefix = pair.getLeft();
+                suffix = pair.getRight();
+                isEq = false;
+                //isInTarget = NBAOperations.accepts(B, prefix, suffix);
+            } else {
 
             
             boolean hasCE = false;
@@ -102,6 +112,7 @@ public class TeacherNBAComp extends TeacherNBA {
                     isEq = false;
                     hasCE = true;
                 }
+            }
                 
                 if(! hasCE) {
                     // by rabit
