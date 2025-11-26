@@ -46,7 +46,7 @@ import roll.words.Word;
 public class LearnerNBAMLDollar extends LearnerBase<NBA>{
     
     private final int dollarLetter;
-    private final LearnerDFA dfaLearner;
+    public final LearnerDFA dfaLearner;
     private final Automaton nonUPWords;
     
     public LearnerNBAMLDollar(Options options, Alphabet alphabet
@@ -100,8 +100,8 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
             String counterexample = dkAutInter.getShortestExample(true);
             if (counterexample != null) {
                 // there is some word not in E*$E+
-                System.out.print("Wrong Form CE: ");
-                System.out.println(counterexample);
+                //System.out.print("Wrong Form CE: ");
+                //System.out.println(counterexample);
                 Word word = alphabet.getWordFromString(counterexample);
                 Query<HashableValue> ceQuery = new QuerySimple<>(word, alphabet.getEmptyWord());
                 ceQuery.answerQuery(getHashableValueBoolean(false));
@@ -153,10 +153,16 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
                     Word word = alphabet.getWordFromString(counterexampleStr);
                     Query<HashableValue> query = new QuerySimple<>(word, alphabet.getEmptyWord());
                     query.answerQuery(answer);
+
+                    
                     dfaLearner.refineHypothesis(query);
+                    
+                    //options.stats.mIntersectQuery = query;
+                    //break;
                     
 
                 } else {
+                    options.stats.mIntersectQuery = null;
                     break;
                 }
             }
@@ -185,6 +191,12 @@ public class LearnerNBAMLDollar extends LearnerBase<NBA>{
         Word prefix = query.getPrefix();
         Word suffix = query.getSuffix();
         options.log.println("Analyzing counterexample for DFA learner...");
+        if (suffix.isEmpty()) {
+            System.out.println("directly internal");
+            dfaLearner.refineHypothesis(query);
+            constructHypothesis();
+            return;
+        }
         Automaton result = FDFAOperations.buildDDollar(prefix, suffix);
         // System.out.println(result.toString());
         String counterexample = null;

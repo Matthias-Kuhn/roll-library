@@ -21,6 +21,9 @@ import java.util.List;
 
 import dk.brics.automaton.Automaton;
 import roll.automata.NBA;
+import roll.query.Query;
+import roll.table.HashableValue;
+import roll.words.Word;
 
 /**
  * @author Yong Li (liyong@ios.ac.cn)
@@ -71,6 +74,9 @@ public class Statistics {
     public NBA hypothesis;
 
     public NBA hypothesisMLDollar;
+    public Word mdWord;
+    public Query<HashableValue> mIntersectQuery;
+    
 
     public NBA dollarCompHypothesis;
     public Automaton ldollarHypo;

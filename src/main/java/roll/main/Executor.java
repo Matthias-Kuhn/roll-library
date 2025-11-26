@@ -46,6 +46,7 @@ import roll.oracle.nba.TeacherTDBAImpl;
 import roll.oracle.nba.sampler.TeacherNBASampler;
 //import roll.oracle.nba.spot.TeacherNBASpot;
 import roll.query.Query;
+import roll.query.QuerySimple;
 import roll.table.HashableValue;
 import roll.util.Timer;
 import roll.words.Alphabet;
@@ -172,10 +173,16 @@ public class Executor {
             Query<HashableValue> ceQuery = teacher.answerEquivalenceQuery(hypothesis);
             boolean isEq = ceQuery.getQueryAnswer().get();
             if(isEq) {
-
-                // store statistics
-                prepareStats(options, learner, hypothesis);
-                break;
+                System.out.println("SucMQ");
+                if (options.stats.mIntersectQuery != null) {
+                    System.out.println("InternalQ");
+                   ceQuery = options.stats.mIntersectQuery;
+                }else {
+                    prepareStats(options, learner, hypothesis);
+                    break;
+                }
+                //prepareStats(options, learner, hypothesis);
+                //break;
             }
             ceQuery.answerQuery(null);
             options.log.verbose("Counterexample is: " + ceQuery.toString());

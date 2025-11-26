@@ -73,24 +73,6 @@ public abstract class LearnerMDFATable extends LearnerDFA {
     }
 
         // return counter example for hypothesis
-    @Override
-    public void refineHypothesis(Query<HashableValue> ceQuery) {
-        
-        ExprValue exprValue = getCounterExampleWord(ceQuery);
-        HashableValue result = ceQuery.getQueryAnswer();
-        if(result == null) {
-            result = processMembershipQuery(ceQuery);
-        }
-        CeAnalyzer analyzer = getCeAnalyzerInstance(exprValue, result);
-        analyzer.analyze();
-        observationTable.addColumn(analyzer.getNewExpriment()); // add new experiment
-        processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - 1, 1);
-        processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - 1, 1);
-        
-        makeTableClosed();
-    }
-    
-    // return counter example for hypothesis
 //    @Override
 //    public void refineHypothesis(Query<HashableValue> ceQuery) {
 //        
@@ -101,30 +83,46 @@ public abstract class LearnerMDFATable extends LearnerDFA {
 //        }
 //        CeAnalyzer analyzer = getCeAnalyzerInstance(exprValue, result);
 //        analyzer.analyze();
-//
-//        Word counterExample = exprValue.get();
-//        int ceLength = counterExample.length();
-//        for (int i = 0; i < ceLength; i++) {
-//    
-//            Word subword = counterExample.getSubWord(i, ceLength-i);
-//            ExprValue newExperiment = new ExprValueWord(subword);
-//            if (observationTable.getColumnIndex(newExperiment) == -1) {
-//                observationTable.addColumn(newExperiment);
-//            }
-//            
-//
-//        }
-//
-//        processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - ceLength, ceLength);
-//        processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - ceLength, ceLength);
-//
-//        //observationTable.addColumn(analyzer.getNewExpriment()); // add new experiment
-//        //processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - 1, 1);
-//        //processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - 1, 1);
+//        observationTable.addColumn(analyzer.getNewExpriment()); // add new experiment
+//        processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - 1, 1);
+//        processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - 1, 1);
 //        
 //        makeTableClosed();
 //    }
+      // return counter example for hypothesis
+    @Override
+    public void refineHypothesis(Query<HashableValue> ceQuery) {
+        
+        ExprValue exprValue = getCounterExampleWord(ceQuery);
+        HashableValue result = ceQuery.getQueryAnswer();
+        if(result == null) {
+            result = processMembershipQuery(ceQuery);
+        }
+        CeAnalyzer analyzer = getCeAnalyzerInstance(exprValue, result);
+        analyzer.analyze();
+
+        Word counterExample = exprValue.get();
+        int ceLength = counterExample.length();
+        for (int i = 0; i < ceLength; i++) {
     
+            Word subword = counterExample.getSubWord(i, ceLength-i);
+            ExprValue newExperiment = new ExprValueWord(subword);
+            if (observationTable.getColumnIndex(newExperiment) == -1) {
+                observationTable.addColumn(newExperiment);
+            }
+            
+
+        }
+
+        processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - ceLength, ceLength);
+        processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - ceLength, ceLength);
+
+        //observationTable.addColumn(analyzer.getNewExpriment()); // add new experiment
+        //processMembershipQueries(observationTable, observationTable.getUpperTable(), observationTable.getColumns().size() - 1, 1);
+        //processMembershipQueries(observationTable, observationTable.getLowerTable(), observationTable.getColumns().size() - 1, 1);
+        
+        makeTableClosed();
+    }  
     protected void createConjecture() {
     	hypothesis = new DFA(alphabet);
     }
